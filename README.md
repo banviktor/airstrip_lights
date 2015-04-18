@@ -1,9 +1,9 @@
-*Kifutópálya világítás megvalósítása*
+**KifutÃ³pÃ¡lya vilÃ¡gÃ­tÃ¡s megvalÃ³sÃ­tÃ¡sa**
 
-Az INT nyomógomb, a fényérzékelõ és a LED0~LED7  LED-ek felhasználásával készítsen kifutópálya világítást a következõk szerint:
+Az INT nyomÃ³gomb, a fÃ©nyÃ©rzÃ©kelÅ‘ Ã©s a LED0~LED7  LED-ek felhasznÃ¡lÃ¡sÃ¡val kÃ©szÃ­tsen kifutÃ³pÃ¡lya vilÃ¡gÃ­tÃ¡st a kÃ¶vetkezÅ‘k szerint:
 
-* a két LED sor képezi a kifutópálya széleit jelzõ lámpasort
-* a LED-ek fényereje függ a külsõ megvilágítástól, a fényérzékelõrõl beolvasott érték alapján 4 különbözõ fényerõt lehet alkalmazni
-* a fényerõt idõzítõ alkalmazásával (idõalap 500 usec) kialakított PWM-mel lehet változtatni 
-* az INT nyomógomb lenyomására változzon a mûködés módja: a kikapcsolás - szabályozott fényerejû mûködés – teljes fényerejû mûködés ciklusban
-* a nyomógomb egy lenyomására csak egy módváltás történjen
+* a kÃ©t LED sor kÃ©pezi a kifutÃ³pÃ¡lya szÃ©leit jelzÅ‘ lÃ¡mpasort
+* a LED-ek fÃ©nyereje fÃ¼gg a kÃ¼lsÅ‘ megvilÃ¡gÃ­tÃ¡stÃ³l, a fÃ©nyÃ©rzÃ©kelÅ‘rÅ‘l beolvasott Ã©rtÃ©k alapjÃ¡n 4 kÃ¼lÃ¶nbÃ¶zÅ‘ fÃ©nyerÅ‘t lehet alkalmazni
+* a fÃ©nyerÅ‘t idÅ‘zÃ­tÅ‘ alkalmazÃ¡sÃ¡val (idÅ‘alap 500 usec) kialakÃ­tott PWM-mel lehet vÃ¡ltoztatni 
+* az INT nyomÃ³gomb lenyomÃ¡sÃ¡ra vÃ¡ltozzon a mÅ±kÃ¶dÃ©s mÃ³dja: a kikapcsolÃ¡s - szabÃ¡lyozott fÃ©nyerejÅ± mÅ±kÃ¶dÃ©s â€“ teljes fÃ©nyerejÅ± mÅ±kÃ¶dÃ©s ciklusban
+* a nyomÃ³gomb egy lenyomÃ¡sÃ¡ra csak egy mÃ³dvÃ¡ltÃ¡s tÃ¶rtÃ©njen
