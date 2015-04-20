@@ -178,7 +178,6 @@ M_INIT:
 ;* MAIN program, Endless loop part
  
 M_LOOP: 	
-	call T0_HANDLER ;DEBUG
 	jmp M_LOOP ; Endless Loop  
 
 
@@ -197,12 +196,35 @@ endif_rotate_led:
 	ret
 
 ADC_IT:
-	push temp ; temp/SREG mentés
+	;temp, SREG lementése stackbe
+	push temp
 	in temp, SREG
 	push temp
 
-	in pwm_cmp, ADCH
+	in temp, ADCH
+	andi temp, 0b0000_0011  ;a biztonság kedvéért kimaszkoljuk ami nem lényeges
 
+	cpi temp, 0
+	brne if_level1
+if_level0:
+	ldi pwm_cmp, 10
+	jmp endif_level
+if_level1:
+	cpi temp, 1
+	brne if_level2
+	ldi pwm_cmp, 20
+	jmp endif_level
+if_level2:
+	cpi temp, 2
+	brne if_level3
+	ldi pwm_cmp, 30
+	jmp endif_level
+if_level3:
+	cpi temp, 3
+	ldi pwm_cmp, 40
+endif_level:
+
+	;temp, SREG visszatöltése stackbõl
 	pop temp
 	out SREG, temp
 	pop temp
@@ -222,8 +244,16 @@ T0_HANDLER:
 	in temp, SREG
 	push temp
 
-	;PWM megvalósítása
+;PWM megvalósítása
 	inc pwm_cntr
+
+	;ha pwm_cntr == 40, nullázzuk
+	cpi pwm_cntr, 40
+	brne endif_overflow
+	ldi pwm_cntr, 0
+endif_overflow:
+
+	;PWM mûködés
 	cp pwm_cmp, pwm_cntr
 	brsh if_leds_off
 	;>> Ha pwm_cntr < pwm_cmp
@@ -235,7 +265,7 @@ if_leds_off:
 	out PORTC, temp
 endif_leds:
 
-	;INT állapotának lekérdezése
+;INT állapotának lekérdezése
 	inc int_cntr
 	cpi int_cntr, 10
 	brne endif_intcntr
