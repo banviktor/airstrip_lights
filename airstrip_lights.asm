@@ -147,12 +147,9 @@ M_INIT:
 ;Ki- és bemenetek inicializálása
 	ldi temp, 0xFF
 	out DDRC, temp        ;LED-ek kimenetek
-	ldi temp, 0b0001_0000        
+	ldi temp, 0b1110_1111        
 	out DDRE, temp   ;DEBUG
 	;sts DDRE, temp		  ;INT bemenet       ;PROD
-	ldi temp, 0b0000_0100
-	out DDRF, temp   ;DEBUG
-	;sts DDRF, temp        ;OPTO bemenet     ;PROD
 
 ;Timer0 inicializálása
 	ldi temp, 0b0000_1011 ;CTC, 32-es Prescale
@@ -190,6 +187,11 @@ SET_BRIGHTNESS:
 	ret
 
 INT_HANDLER:
+	inc mode
+	cpi mode, 4
+	brlo end_mode_reset
+	ldi mode, 0
+end_mode_reset:
 	ret
 
 T0_HANDLER:
