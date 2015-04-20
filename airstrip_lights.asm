@@ -173,7 +173,13 @@ M_LOOP:
 ;* Subroutines, Interrupt routines
 
 ROTATE:
-
+	cp led, led_final
+	breq else_rotate_led ;ha egyenlõk, ugrik
+if_rotate_led:	
+	lsr led ;lépteti a ledeket
+else_rotate_led:
+	mov led, led_initial ;betölti a kezdeti led-állást
+endif_rotate_led:
 	ret
 
 SET_BRIGHTNESS:
