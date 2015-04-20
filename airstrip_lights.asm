@@ -139,7 +139,7 @@ M_INIT:
 	mov led, led_initial
 	ldi mode, 0b0000_0001
 	ldi brightness, 0
-	ldi pwm_cmp, 0
+	ldi pwm_cmp, 5
 	ldi pwm_cntr, 0
 	ldi int_state, 0
 	ldi int_cntr, 0
@@ -165,7 +165,8 @@ M_INIT:
 ;* MAIN program, Endless loop part
  
 M_LOOP: 
-
+	;Debugginghoz itt timerkedünk
+	call T0_HANDLER
 	jmp M_LOOP ; Endless Loop  
 
 
@@ -181,7 +182,6 @@ SET_BRIGHTNESS:
 	ret
 
 INT_HANDLER:
-
 	ret
 
 T0_HANDLER:
@@ -190,19 +190,45 @@ T0_HANDLER:
 	in temp, SREG
 	push temp
 
+	;PWM megvalósítása
+	inc pwm_cntr
+	cp pwm_cmp, pwm_cntr
+	brsh if_leds_off
+	;>> Ha pwm_cntr < pwm_cmp
+	out PORTC, led
+	jmp endif_leds
+if_leds_off:
+	;>> Ha pwm_cntr >= pwm_cmp
+	ldi temp, 0
+	out PORTC, temp
+endif_leds:
+
+	;INT állapotának lekérdezése
+	inc int_cntr
+	cpi int_cntr, 10
+	brne endif_intcntr
+	;>> Ha int_cntr == 10
+	;Balra shifteljük int_state-et, majd az utolsó bitjébe betöltjük INT állapotát
+	ldi int_cntr, 0
+	lsl int_state
+	;lds temp, PINE
+	in temp, PINE
+	bst temp, 4
+	bld int_state, 0
+	
+	;Megvizsgáljuk az utolsó 4 bitet
+	andi int_state, 0x0F
+	cpi int_state, 0b0000_1100	
+	brne endif_intcntr
+	;>> Ha int_state == 0b0000_1100
+	call INT_HANDLER
+endif_intcntr:
+
 	;temp, SREG visszatöltése stackbõl
 	pop temp
 	out SREG, temp
 	pop temp
 	reti
-
-
-
-
-
-
-
-
 
 
 

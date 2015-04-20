@@ -1,3 +1,4 @@
 #AVR Studio 4
-*.aps
-*.aws
+*
+!*.asm
+!*.md
