@@ -49,7 +49,6 @@
 ; változók
 	.def temp = r16
 	.def mode = r17
-	.def brightness = r18
 	.def pwm_cmp = r19
 	.def pwm_cntr = r20
 	.def led = r21
@@ -81,7 +80,7 @@
 	jmp DUMMY_IT	; USART0 RX Complete Handler 
 	jmp DUMMY_IT	; USART0 Data Register Empty Hanlder 
 	jmp DUMMY_IT	; USART0 TX Complete Handler 
-	jmp DUMMY_IT	; ADC Conversion Complete Handler 
+	jmp ADC_IT		; ADC Conversion Complete Handler 
 	jmp DUMMY_IT	; EEPROM Ready Hanlder 
 	jmp DUMMY_IT	; Analog Comparator Handler 
 	jmp DUMMY_IT	; Timer1 Compare Match C Handler 
@@ -138,7 +137,6 @@ M_INIT:
 ;Kezdõállapot betöltése
 	mov led, led_initial
 	ldi mode, 0b0000_0001
-	ldi brightness, 0
 	ldi pwm_cmp, 0
 	ldi pwm_cntr, 0
 	ldi int_state, 0
@@ -159,6 +157,22 @@ M_INIT:
 	ldi temp, 0b0000_0010 ;IT: Output Compare Match
 	out TIMSK, temp
 
+;Opto, ADC inicializálása
+	ldi temp, 0b01000010 ; ADMUX: 5V ref, balra igazított, poti
+		      ; 01...... ; REFS = 01 (referenciafeszültség: 5V VCC)
+              ; ..0..... ; ADLAR = 0  (jobbra igazított)
+              ; ...00010 ; ADMUX = 00010 Fotorezisztor (fényellenállás)
+	out ADMUX, temp
+	ldi temp, 0b11101111 ; ADCSRA: folyamatos futás, IT, 128-as elõosztó
+			  ; 1....... ; ADEN = 1 (A/D engedélyezése)
+              ; .1...... ; ADSC = 1 (start conversion)
+              ; ..1..... ; ADFR = 1 (free running / folyamatos konverzió)
+              ; ...0.... ; ADIF (nem töröljük a megszakításjelzõ flaget)
+              ; ....1... ; ADIE = 1 (megszakítások engedélyezése)
+              ; .....111 ; ADPS = 111 (128-as elõosztó)
+	out ADCSRA, temp
+
+	sei ;globális interrupt
 
 ;*************************************************************** 
 ;* MAIN program, Endless loop part
@@ -178,14 +192,21 @@ if_rotate_led:
 	lsr led ;lépteti a ledeket
 	jmp endif_rotate_led
 else_rotate_led:
-	call SET_BRIGHTNESS
 	mov led, led_initial ;betölti a kezdeti led-állást
 endif_rotate_led:
 	ret
 
-SET_BRIGHTNESS:
-	
-	ret
+ADC_IT:
+	push temp ; temp/SREG mentés
+	in temp, SREG
+	push temp
+
+	in pwm_cmp, ADCH
+
+	pop temp
+	out SREG, temp
+	pop temp
+	reti
 
 INT_HANDLER:
 	inc mode
