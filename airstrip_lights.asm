@@ -231,7 +231,6 @@ if_level2:
 	jmp endif_level
 if_level3:
 ;ha full fényerõ
-	cpi temp, 3
 	ldi pwm_cmp, 40
 endif_level:
 
