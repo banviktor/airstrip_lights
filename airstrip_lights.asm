@@ -151,7 +151,7 @@ M_INIT:
 	out DDRE, temp   ;DEBUG
 	;sts DDRE, temp		  ;INT bemenet       ;PROD
 	ldi temp, 0b0000_0100
-	sts DDRF, temp   ;DEBUG
+	out DDRF, temp   ;DEBUG
 	;sts DDRF, temp        ;OPTO bemenet     ;PROD
 
 ;Timer0 inicializálása
