@@ -44,16 +44,17 @@
 .equ const =$00 ; Generic Constant Structure example  
 ;* Program Variables Definitions 
 ; konstansok
-	.def led_initial = r1;
-	.def led_final = r2;
+	.def led_initial = r1
+	.def led_final = r2
 ; változók
-	.def temp = r16;
-	.def mode = r17;
-	.def brightness = r18;
-	.def pwm_cmp = r19;
-	.def pwm_cntr = r20;
-	.def led = r21;
-	.def int_state = r22;
+	.def temp = r16
+	.def mode = r17
+	.def brightness = r18
+	.def pwm_cmp = r19
+	.def pwm_cntr = r20
+	.def led = r21
+	.def int_state = r22
+	.def int_cntr = r23
 
 ;*************************************************************** 
 ;* Reset & Interrupt Vectors  
@@ -125,21 +126,45 @@ RESET:
 	out SPH, temp 
 
 M_INIT:
-;< ki- és bemenetek inicializálása stb > 
-	ldi temp, 0b1100_1100
-	mov led_initial, temp;
-	ldi temp, 0b1001_1001
-	mov led_final, temp;
 
-	
+;LED-ek kezdõállapota
+	ldi temp, 0b1100_1100
+	mov led_initial, temp
+
+;LED-ek végállapota
+	ldi temp, 0b1001_1001
+	mov led_final, temp
+
+;Kezdõállapot betöltése
+	mov led, led_initial
+	ldi mode, 0b0000_0001
+	ldi brightness, 0
+	ldi pwm_cmp, 0
+	ldi pwm_cntr, 0
+	ldi int_state, 0
+	ldi int_cntr, 0
+
+;Ki- és bemenetek inicializálása
+	ldi temp, 0xFF
+	out DDRC, temp        ;LED-ek kimenetek
+	ldi temp, 0b0001_0000        
+	sts DDRE, temp		  ;INT bemenet
+	ldi temp, 0b0000_0100
+	sts DDRF, temp        ;OPTO bemenet
+
+;Timer0 inicializálása
+	ldi temp, 0b0000_1011 ;CTC, 32-es Prescale
+	out TCCR0, temp
+	ldi temp, 172         ;173-as modulus
+	out OCR0, temp
+	ldi temp, 0b0000_0010 ;IT: Output Compare Match
+	out TIMSK, temp
 
 
 ;*************************************************************** 
 ;* MAIN program, Endless loop part
  
 M_LOOP: 
-
-;< fõciklus >
 
 	jmp M_LOOP ; Endless Loop  
 
@@ -160,7 +185,15 @@ INT_HANDLER:
 	ret
 
 T0_HANDLER:
+	;temp, SREG lementése stackbe
+	push temp
+	in temp, SREG
+	push temp
 
+	;temp, SREG visszatöltése stackbõl
+	pop temp
+	out SREG, temp
+	pop temp
 	reti
 
 
