@@ -1,9 +1,13 @@
 ;*************************************************************** 
-;* Feladat: 
-;* Rövid leírás:
+;* Feladat: Kifutópálya világítás megvalósítása
+;* Rövid leírás: 
+;	Az INT nyomógomb, a fényérzékelõ és a LED0~LED7
+;	LED-ek felhasználásával készítsen kifutópálya világítást!
 ; 
 ;* Szerzõk: 
-;* Mérõcsoport: <merocsoport jele>
+;	Bán Viktor Gergely
+;	Károlyi Áron
+;* Mérõcsoport: CDE05
 ;
 ;***************************************************************
 ;* "AVR ExperimentBoard" port assignment information:
