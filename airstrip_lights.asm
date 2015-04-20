@@ -43,7 +43,17 @@
 ;* Program Constants 
 .equ const =$00 ; Generic Constant Structure example  
 ;* Program Variables Definitions 
-.def temp =r16 ; Temporary Register example 
+; konstansok
+	.def led_initial = r1;
+	.def led_final = r2;
+; változók
+	.def temp = r16;
+	.def mode = r17;
+	.def brightness = r18;
+	.def pwm_cmp = r19;
+	.def pwm_cntr = r20;
+	.def led = r21;
+	.def int_state = r22;
 
 ;*************************************************************** 
 ;* Reset & Interrupt Vectors  
@@ -64,7 +74,7 @@
 	jmp DUMMY_IT	; Timer1 Compare Match A Handler 
 	jmp DUMMY_IT	; Timer1 Compare Match B Handler 
 	jmp DUMMY_IT	; Timer1 Overflow Handler 
-	jmp DUMMY_IT	; Timer0 Compare Match Handler 
+	jmp T0_HANDLER	; Timer0 Compare Match Handler 
 	jmp DUMMY_IT	; Timer0 Overflow Handler 
 	jmp DUMMY_IT	; SPI Transfer Complete Handler 
 	jmp DUMMY_IT	; USART0 RX Complete Handler 
@@ -116,6 +126,12 @@ RESET:
 
 M_INIT:
 ;< ki- és bemenetek inicializálása stb > 
+	ldi temp, 0b1100_1100
+	mov led_initial, temp;
+	ldi temp, 0b1001_1001
+	mov led_final, temp;
+
+	
 
 
 ;*************************************************************** 
@@ -131,6 +147,21 @@ M_LOOP:
 ;*************************************************************** 
 ;* Subroutines, Interrupt routines
 
+ROTATE:
+
+	ret
+
+SET_BRIGHTNESS:
+
+	ret
+
+INT_HANDLER:
+
+	ret
+
+T0_HANDLER:
+
+	reti
 
 
 
