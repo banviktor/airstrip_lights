@@ -80,7 +80,7 @@
 	jmp DUMMY_IT	; USART0 RX Complete Handler 
 	jmp DUMMY_IT	; USART0 Data Register Empty Hanlder 
 	jmp DUMMY_IT	; USART0 TX Complete Handler 
-	jmp ADC_IT		; ADC Conversion Complete Handler 
+	jmp ADC_IT  	; ADC Conversion Complete Handler 
 	jmp DUMMY_IT	; EEPROM Ready Hanlder 
 	jmp DUMMY_IT	; Analog Comparator Handler 
 	jmp DUMMY_IT	; Timer1 Compare Match C Handler 
@@ -158,7 +158,7 @@ M_INIT:
 	out TIMSK, temp
 
 ;Opto, ADC inicializálása
-	ldi temp, 0b01000010 ; ADMUX: 5V ref, balra igazított, poti
+	ldi temp, 0b01000010 ; ADMUX: 5V ref, jobbra igazított, foto
 		      ; 01...... ; REFS = 01 (referenciafeszültség: 5V VCC)
               ; ..0..... ; ADLAR = 0  (jobbra igazított)
               ; ...00010 ; ADMUX = 00010 Fotorezisztor (fényellenállás)
