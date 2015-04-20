@@ -201,6 +201,16 @@ ADC_IT:
 	in temp, SREG
 	push temp
 
+;ha ki van kapcsolva
+	cpi mode, 0
+	brne if_on
+	ldi pwm_cmp, 0
+	jmp endif_level
+if_on:
+	cpi mode, 1
+	brne if_level3
+
+;ha szabályozott
 	in temp, ADCH
 	andi temp, 0b0000_0011  ;a biztonság kedvéért kimaszkoljuk ami nem lényeges
 
@@ -220,6 +230,7 @@ if_level2:
 	ldi pwm_cmp, 30
 	jmp endif_level
 if_level3:
+;ha full fényerõ
 	cpi temp, 3
 	ldi pwm_cmp, 40
 endif_level:
@@ -232,7 +243,7 @@ endif_level:
 
 INT_HANDLER:
 	inc mode
-	cpi mode, 4
+	cpi mode, 3
 	brlo end_mode_reset
 	ldi mode, 0
 end_mode_reset:
