@@ -178,12 +178,13 @@ if_rotate_led:
 	lsr led ;lépteti a ledeket
 	jmp endif_rotate_led
 else_rotate_led:
+	call SET_BRIGHTNESS
 	mov led, led_initial ;betölti a kezdeti led-állást
 endif_rotate_led:
 	ret
 
 SET_BRIGHTNESS:
-
+	
 	ret
 
 INT_HANDLER:
