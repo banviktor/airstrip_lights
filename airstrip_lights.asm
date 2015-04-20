@@ -139,7 +139,7 @@ M_INIT:
 	mov led, led_initial
 	ldi mode, 0b0000_0001
 	ldi brightness, 0
-	ldi pwm_cmp, 5
+	ldi pwm_cmp, 0
 	ldi pwm_cntr, 0
 	ldi int_state, 0
 	ldi int_cntr, 0
@@ -148,9 +148,11 @@ M_INIT:
 	ldi temp, 0xFF
 	out DDRC, temp        ;LED-ek kimenetek
 	ldi temp, 0b0001_0000        
-	sts DDRE, temp		  ;INT bemenet
+	out DDRE, temp   ;DEBUG
+	;sts DDRE, temp		  ;INT bemenet       ;PROD
 	ldi temp, 0b0000_0100
-	sts DDRF, temp        ;OPTO bemenet
+	sts DDRF, temp   ;DEBUG
+	;sts DDRF, temp        ;OPTO bemenet     ;PROD
 
 ;Timer0 inicializálása
 	ldi temp, 0b0000_1011 ;CTC, 32-es Prescale
@@ -164,9 +166,8 @@ M_INIT:
 ;*************************************************************** 
 ;* MAIN program, Endless loop part
  
-M_LOOP: 
-	;Debugginghoz itt timerkedünk
-	call T0_HANDLER
+M_LOOP: 	
+	call T0_HANDLER ;DEBUG
 	jmp M_LOOP ; Endless Loop  
 
 
@@ -178,6 +179,7 @@ ROTATE:
 	breq else_rotate_led ;ha egyenlõk, ugrik
 if_rotate_led:	
 	lsr led ;lépteti a ledeket
+	jmp endif_rotate_led
 else_rotate_led:
 	mov led, led_initial ;betölti a kezdeti led-állást
 endif_rotate_led:
@@ -217,8 +219,8 @@ endif_leds:
 	;Balra shifteljük int_state-et, majd az utolsó bitjébe betöltjük INT állapotát
 	ldi int_cntr, 0
 	lsl int_state
-	;lds temp, PINE
-	in temp, PINE
+	;lds temp, PINE ;PROD
+	in temp, PINE   ;DEBUG
 	bst temp, 4
 	bld int_state, 0
 	
