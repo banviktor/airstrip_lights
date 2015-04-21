@@ -43,10 +43,6 @@
 ;* Program Constants 
 .equ const =$00 ; Generic Constant Structure example  
 ;* Program Variables Definitions 
-; konstansok
-	.def led_initial = r1
-	.def led_final = r2
-; változók
 	.def temp = r16
 	.def mode = r17
 	.def pwm_cmp = r19
@@ -54,6 +50,8 @@
 	.def led = r21
 	.def int_state = r22
 	.def int_cntr = r23
+	.def rotate_cntr1 = r24
+	.def rotate_cntr0 = r25
 
 ;*************************************************************** 
 ;* Reset & Interrupt Vectors  
@@ -126,21 +124,15 @@ RESET:
 
 M_INIT:
 
-;LED-ek kezdõállapota
-	ldi temp, 0b1100_1100
-	mov led_initial, temp
-
-;LED-ek végállapota
-	ldi temp, 0b1001_1001
-	mov led_final, temp
-
 ;Kezdõállapot betöltése
-	mov led, led_initial
+	ldi led,  0b1100_1100
 	ldi mode, 0b0000_0001
 	ldi pwm_cmp, 0
 	ldi pwm_cntr, 0
 	ldi int_state, 0
 	ldi int_cntr, 0
+	ldi rotate_cntr1, 0x01
+	ldi rotate_cntr0, 0xF4 ;256-12=244
 
 ;Ki- és bemenetek inicializálása
 	ldi temp, 0xFF
@@ -185,14 +177,18 @@ M_LOOP:
 ;* Subroutines, Interrupt routines
 
 ROTATE:
-	cp led, led_final
-	breq else_rotate_led ;ha egyenlõk, ugrik
-if_rotate_led:	
-	lsr led ;lépteti a ledeket
-	jmp endif_rotate_led
-else_rotate_led:
-	mov led, led_initial ;betölti a kezdeti led-állást
-endif_rotate_led:
+	cpi led, 0b0011_0011
+	brne rotate_led_1	;ha egyenlõk, a következõt tölti be
+	ldi led, 0b1001_1001
+	jmp rotate_end
+rotate_led_1:
+	cpi led, 0b1001_1001
+	brne rotate_led_2	;ha egyenlõk, a következõt tölti be
+	ldi led, 0b1100_1100
+	jmp rotate_end
+rotate_led_2:
+	lsr led	;ha egyikkel sem egyezik, eltolja
+rotate_end:
 	ret
 
 ADC_IT:
@@ -248,7 +244,7 @@ INT_HANDLER:
 end_mode_reset:
 	ret
 
-T0_HANDLER:
+T0_HANDLER:	;500 usecenként
 	;temp, SREG lementése stackbe
 	push temp
 	in temp, SREG
@@ -295,6 +291,18 @@ endif_leds:
 	;>> Ha int_state == 0b0000_1100
 	call INT_HANDLER
 endif_intcntr:
+
+;ROTATE hívása 4Hz = 0.25sec = 500 lépésenként
+	dec rotate_cntr0
+	cpi rotate_cntr0, 0xFF
+	brne endif_rotatecall
+	dec rotate_cntr1
+	cpi rotate_cntr1, 0xFF
+	brne endif_rotatecall
+	ldi rotate_cntr1, 0x01
+	ldi rotate_cntr0, 0xF4 ;256-12=244
+	call ROTATE
+endif_rotatecall:
 
 	;temp, SREG visszatöltése stackbõl
 	pop temp
