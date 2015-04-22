@@ -135,11 +135,10 @@ M_INIT:
 	ldi rotate_cntr0, 250
 
 ;Ki- és bemenetek inicializálása
-	ldi temp, 0xFF
-	out DDRC, temp        ;LED-ek kimenetek
-	ldi temp, 0b1110_1111        
-	out DDRE, temp   ;DEBUG
-	;sts DDRE, temp		  ;INT bemenet       ;PROD
+	ldi temp, 0xFF        ;LED-ek kimenetek
+	out DDRC, temp        
+	ldi temp, 0b1110_1111 ;INT bemenet
+	sts DDRE, temp		  
 
 ;Timer0 inicializálása
 	ldi temp, 0b0000_1011 ;CTC, 32-es Prescale
@@ -279,8 +278,7 @@ endif_leds:
 	;Balra shifteljük int_state-et, majd az utolsó bitjébe betöltjük INT állapotát
 	ldi int_cntr, 0
 	lsl int_state
-	;lds temp, PINE ;PROD
-	in temp, PINE   ;DEBUG
+	lds temp, PINE
 	bst temp, 4
 	bld int_state, 0
 	
