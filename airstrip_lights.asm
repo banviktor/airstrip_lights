@@ -45,13 +45,13 @@
 ;* Program Variables Definitions 
 	.def temp = r16
 	.def mode = r17
-	.def pwm_cmp = r19
-	.def pwm_cntr = r20
-	.def led = r21
-	.def int_state = r22
-	.def int_cntr = r23
-	.def rotate_cntr1 = r24
-	.def rotate_cntr0 = r25
+	.def pwm_cmp = r18
+	.def pwm_cntr = r19
+	.def led = r20
+	.def int_state = r21
+	.def int_cntr = r22
+	.def rotate_cntr1 = r23
+	.def rotate_cntr0 = r24
 
 ;*************************************************************** 
 ;* Reset & Interrupt Vectors  
@@ -126,7 +126,7 @@ M_INIT:
 
 ;Kezdõállapot betöltése
 	ldi led,  0b1100_1100
-	ldi mode, 0b0000_0001
+	ldi mode, 0
 	ldi pwm_cmp, 0
 	ldi pwm_cntr, 0
 	ldi int_state, 0
@@ -200,7 +200,7 @@ ADC_IT:
 ;ha ki van kapcsolva
 	cpi mode, 0
 	brne if_on
-	ldi pwm_cmp, 0
+	ldi pwm_cmp, 0    ;  0% fényerõ 
 	jmp endif_level
 if_on:
 	cpi mode, 1
@@ -213,21 +213,21 @@ if_on:
 	cpi temp, 0
 	brne if_level1
 if_level0:
-	ldi pwm_cmp, 10
+	ldi pwm_cmp, 10    ; 25% fényerõ 
 	jmp endif_level
 if_level1:
 	cpi temp, 1
 	brne if_level2
-	ldi pwm_cmp, 20
+	ldi pwm_cmp, 20    ; 50% fényerõ 
 	jmp endif_level
 if_level2:
 	cpi temp, 2
 	brne if_level3
-	ldi pwm_cmp, 30
+	ldi pwm_cmp, 30    ; 75% fényerõ 
 	jmp endif_level
 if_level3:
 ;ha full fényerõ
-	ldi pwm_cmp, 40
+	ldi pwm_cmp, 40    ;100% fényerõ 
 endif_level:
 
 	;temp, SREG visszatöltése stackbõl
