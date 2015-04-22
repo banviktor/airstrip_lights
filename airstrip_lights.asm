@@ -260,7 +260,7 @@ T0_HANDLER:	;500 usecenként
 endif_overflow:
 
 	;PWM mûködés
-	cp pwm_cmp, pwm_cntr
+	cp pwm_cntr, pwm_cmp
 	brsh if_leds_off
 	;>> Ha pwm_cntr < pwm_cmp
 	out PORTC, led
@@ -307,7 +307,3 @@ endif_rotatecall:
 	out SREG, temp
 	pop temp
 	reti
-
-
-
-
