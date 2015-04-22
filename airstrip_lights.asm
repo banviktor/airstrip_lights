@@ -131,8 +131,8 @@ M_INIT:
 	ldi pwm_cntr, 0
 	ldi int_state, 0
 	ldi int_cntr, 0
-	ldi rotate_cntr1, 0x01
-	ldi rotate_cntr0, 0xF4 ;256-12=244
+	ldi rotate_cntr1, 2
+	ldi rotate_cntr0, 250
 
 ;Ki- és bemenetek inicializálása
 	ldi temp, 0xFF
@@ -294,13 +294,11 @@ endif_intcntr:
 
 ;ROTATE hívása 4Hz = 0.25sec = 500 lépésenként
 	dec rotate_cntr0
-	cpi rotate_cntr0, 0xFF
 	brne endif_rotatecall
+	ldi rotate_cntr0, 250
 	dec rotate_cntr1
-	cpi rotate_cntr1, 0xFF
 	brne endif_rotatecall
-	ldi rotate_cntr1, 0x01
-	ldi rotate_cntr0, 0xF4 ;256-12=244
+	ldi rotate_cntr1, 2
 	call ROTATE
 endif_rotatecall:
 
