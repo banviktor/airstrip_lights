@@ -137,8 +137,8 @@ M_INIT:
 ;Ki- és bemenetek inicializálása
 	ldi temp, 0xFF        ;LED-ek kimenetek
 	out DDRC, temp        
-	ldi temp, 0b1110_1111 ;INT bemenet
-	sts DDRE, temp		  
+	ldi temp, 0 ;INT bemenet
+	out DDRE, temp		  
 
 ;Timer0 inicializálása
 	ldi temp, 0b0000_1011 ;CTC, 32-es Prescale
@@ -149,9 +149,9 @@ M_INIT:
 	out TIMSK, temp
 
 ;Opto, ADC inicializálása
-	ldi temp, 0b01000010 ; ADMUX: 5V ref, jobbra igazított, foto
+	ldi temp, 0b01100010 ; ADMUX: 5V ref, jobbra igazított, foto
 		      ; 01...... ; REFS = 01 (referenciafeszültség: 5V VCC)
-              ; ..0..... ; ADLAR = 0  (jobbra igazított)
+              ; ..1..... ; ADLAR = 1  (balra igazított)
               ; ...00010 ; ADMUX = 00010 Fotorezisztor (fényellenállás)
 	out ADMUX, temp
 	ldi temp, 0b11101111 ; ADCSRA: folyamatos futás, IT, 128-as elõosztó
@@ -203,32 +203,37 @@ ADC_IT:
 	jmp endif_level
 if_on:
 	cpi mode, 1
-	brne if_level3
+	brne if_level0
 
 ;ha szabályozott
 	in temp, ADCH
-	andi temp, 0b0000_0011  ;a biztonság kedvéért kimaszkoljuk ami nem lényeges
+	andi temp, 0b1110_0000
+	lsr temp
+	lsr temp
+	lsr temp
+	lsr temp
+	lsr temp
 
 	cpi temp, 0
 	brne if_level1
 if_level0:
-	ldi pwm_cmp, 10    ; 25% fényerõ 
+	ldi pwm_cmp, 40
 	jmp endif_level
 if_level1:
 	cpi temp, 1
 	brne if_level2
-	ldi pwm_cmp, 20    ; 50% fényerõ 
+	ldi pwm_cmp, 20
 	jmp endif_level
 if_level2:
 	cpi temp, 2
 	brne if_level3
-	ldi pwm_cmp, 30    ; 75% fényerõ 
+	ldi pwm_cmp, 10 
 	jmp endif_level
 if_level3:
-;ha full fényerõ
-	ldi pwm_cmp, 40    ;100% fényerõ 
+	ldi pwm_cmp, 1 
 endif_level:
 
+	nop
 	;temp, SREG visszatöltése stackbõl
 	pop temp
 	out SREG, temp
@@ -272,13 +277,13 @@ endif_leds:
 
 ;INT állapotának lekérdezése
 	inc int_cntr
-	cpi int_cntr, 10
+	cpi int_cntr, 20
 	brne endif_intcntr
 	;>> Ha int_cntr == 10
 	;Balra shifteljük int_state-et, majd az utolsó bitjébe betöltjük INT állapotát
 	ldi int_cntr, 0
 	lsl int_state
-	lds temp, PINE
+	in temp, PINE
 	bst temp, 4
 	bld int_state, 0
 	
